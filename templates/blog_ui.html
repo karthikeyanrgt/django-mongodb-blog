@@ -1,0 +1,260 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.logo{width:28px;height:28px;background:#1a1a2e;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo i{color:#fff;font-size:14px}
+.app-title{font-size:15px;font-weight:500}
+.app-sub{font-size:12px;color:var(--color-text-secondary)}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#3B6D11;display:inline-block;margin-right:5px}
+.status-label{font-size:12px;color:var(--color-text-secondary)}
+.main{display:grid;grid-template-columns:300px minmax(0,1fr);gap:0;min-height:560px}
+.sidebar{border-right:0.5px solid var(--color-border-tertiary);padding:20px 16px;background:var(--color-background-secondary)}
+.sidebar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sidebar-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em}
+.new-btn{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:5px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer}
+.new-btn:hover{background:var(--color-background-secondary)}
+.blog-item{padding:10px 12px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid transparent;margin-bottom:6px;background:var(--color-background-primary)}
+.blog-item:hover{border-color:var(--color-border-tertiary)}
+.blog-item.active{border-color:var(--color-border-secondary);background:var(--color-background-primary)}
+.blog-item-title{font-size:13px;font-weight:500;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.blog-item-meta{font-size:11px;color:var(--color-text-tertiary)}
+.content{padding:24px}
+.content-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.view-title{font-size:18px;font-weight:500}
+.action-bar{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--border-radius-md);font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary)}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-danger{border-color:var(--color-border-danger);color:var(--color-text-danger)}
+.btn-danger:hover{background:var(--color-background-danger)}
+.btn-primary{background:#1a1a2e;color:#fff;border-color:#1a1a2e}
+.btn-primary:hover{background:#2d2d4e}
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px;display:block}
+.form-input{width:100%;padding:9px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:14px;background:var(--color-background-primary);color:var(--color-text-primary);font-family:var(--font-sans)}
+.form-input:focus{outline:none;border-color:var(--color-border-primary)}
+textarea.form-input{resize:vertical;min-height:140px;line-height:1.6}
+.meta-row{display:flex;gap:20px;margin-bottom:20px;padding:12px 14px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary)}
+.meta-item{font-size:12px}
+.meta-key{color:var(--color-text-tertiary);margin-bottom:2px}
+.meta-val{color:var(--color-text-primary);font-weight:500}
+.blog-content-view{font-size:14px;line-height:1.8;color:var(--color-text-secondary);white-space:pre-wrap}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;color:var(--color-text-tertiary);gap:10px}
+.empty-state i{font-size:36px}
+.empty-state p{font-size:14px}
+.toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:var(--border-radius-md);font-size:13px;font-weight:500;border:0.5px solid;opacity:0;transition:opacity .3s;z-index:999;pointer-events:none}
+.toast.success{background:var(--color-background-success);color:var(--color-text-success);border-color:var(--color-border-success)}
+.toast.error{background:var(--color-background-danger);color:var(--color-text-danger);border-color:var(--color-border-danger)}
+.toast.show{opacity:1}
+.spinner{width:16px;height:16px;border:2px solid var(--color-border-tertiary);border-top-color:var(--color-text-secondary);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-row{display:flex;align-items:center;gap:8px;color:var(--color-text-tertiary);font-size:13px;padding:20px 0}
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;background:var(--color-background-info);color:var(--color-text-info)}
+.divider{height:0.5px;background:var(--color-border-tertiary);margin:16px 0}
+</style>
+
+<h2 class="sr-only">Blog management dashboard — create, view, edit, and delete blog posts via your Django API</h2>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo"><i class="ti ti-article" aria-hidden="true"></i></div>
+    <div>
+      <div class="app-title">BlogManager</div>
+      <div class="app-sub">Django + MongoDB</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px">
+    <span><span class="status-dot" id="connDot"></span><span class="status-label" id="connLabel">Connecting...</span></span>
+    <code style="font-size:11px;color:var(--color-text-tertiary);font-family:var(--font-mono)">localhost:8000</code>
+  </div>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title">Posts <span class="badge" id="countBadge">0</span></span>
+      <button class="new-btn" onclick="showForm()"><i class="ti ti-plus" aria-hidden="true"></i>New</button>
+    </div>
+    <div id="blogList"><div class="loading-row"><div class="spinner"></div>Loading posts...</div></div>
+  </div>
+
+  <div class="content">
+    <div id="emptyPane" class="empty-state">
+      <i class="ti ti-article" aria-hidden="true"></i>
+      <p>Select a post or create a new one</p>
+    </div>
+
+    <div id="viewPane" style="display:none">
+      <div class="content-header">
+        <div>
+          <div class="view-title" id="viewTitle"></div>
+        </div>
+        <div class="action-bar">
+          <button class="btn" onclick="editCurrent()"><i class="ti ti-edit" aria-hidden="true"></i>Edit</button>
+          <button class="btn btn-danger" onclick="deleteCurrent()"><i class="ti ti-trash" aria-hidden="true"></i>Delete</button>
+        </div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-item"><div class="meta-key">Post ID</div><div class="meta-val" id="viewId" style="font-family:var(--font-mono);font-size:11px"></div></div>
+        <div class="meta-item"><div class="meta-key">Created</div><div class="meta-val" id="viewDate"></div></div>
+      </div>
+      <div class="blog-content-view" id="viewContent"></div>
+    </div>
+
+    <div id="formPane" style="display:none">
+      <div class="content-header">
+        <div class="view-title" id="formTitle">New post</div>
+        <div class="action-bar">
+          <button class="btn" onclick="cancelForm()">Cancel</button>
+          <button class="btn btn-primary" onclick="submitForm()"><i class="ti ti-check" aria-hidden="true"></i><span id="submitLabel">Publish</span></button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="fTitle">Title</label>
+        <input class="form-input" id="fTitle" type="text" placeholder="Enter blog title...">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="fContent">Content</label>
+        <textarea class="form-input" id="fContent" placeholder="Write your blog content here..."></textarea>
+      </div>
+      <div id="formError" style="font-size:12px;color:var(--color-text-danger);margin-top:4px;display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://127.0.0.1:8000/api';
+let blogs = [];
+let currentId = null;
+let editingId = null;
+
+function showToast(msg, type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type+' show';
+  setTimeout(()=>t.className='toast',2800);
+}
+
+function fmtDate(iso){
+  try{ return new Date(iso).toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+  catch(e){ return iso; }
+}
+
+async function loadBlogs(){
+  try{
+    const r=await fetch(API+'/blogs/');
+    if(!r.ok) throw new Error();
+    const d=await r.json();
+    blogs=d.blogs||[];
+    document.getElementById('countBadge').textContent=blogs.length;
+    document.getElementById('connDot').style.background='#3B6D11';
+    document.getElementById('connLabel').textContent='Connected';
+    renderList();
+  } catch(e){
+    document.getElementById('connDot').style.background='#A32D2D';
+    document.getElementById('connLabel').textContent='Offline';
+    document.getElementById('blogList').innerHTML='<div style="font-size:12px;color:var(--color-text-danger);padding:8px 0">Cannot reach API. Is Django running?</div>';
+  }
+}
+
+function renderList(){
+  const el=document.getElementById('blogList');
+  if(!blogs.length){
+    el.innerHTML='<div style="font-size:12px;color:var(--color-text-tertiary);padding:8px 0">No posts yet. Create one!</div>';
+    return;
+  }
+  el.innerHTML=blogs.map(b=>`
+    <div class="blog-item${b.id===currentId?' active':''}" onclick="viewBlog('${b.id}')">
+      <div class="blog-item-title">${esc(b.title)}</div>
+      <div class="blog-item-meta">${fmtDate(b.created_at)}</div>
+    </div>`).join('');
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showPane(name){
+  ['emptyPane','viewPane','formPane'].forEach(id=>{
+    document.getElementById(id).style.display=id===name+'Pane'?'block':'none';
+  });
+}
+
+function viewBlog(id){
+  currentId=id; editingId=null;
+  const b=blogs.find(x=>x.id===id);
+  if(!b) return;
+  document.getElementById('viewTitle').textContent=b.title;
+  document.getElementById('viewId').textContent=b.id;
+  document.getElementById('viewDate').textContent=fmtDate(b.created_at);
+  document.getElementById('viewContent').textContent=b.content;
+  renderList();
+  showPane('view');
+}
+
+function showForm(id=null){
+  editingId=id;
+  document.getElementById('formTitle').textContent=id?'Edit post':'New post';
+  document.getElementById('submitLabel').textContent=id?'Save changes':'Publish';
+  document.getElementById('formError').style.display='none';
+  if(id){
+    const b=blogs.find(x=>x.id===id);
+    document.getElementById('fTitle').value=b.title;
+    document.getElementById('fContent').value=b.content;
+  } else {
+    document.getElementById('fTitle').value='';
+    document.getElementById('fContent').value='';
+  }
+  showPane('form');
+}
+
+function editCurrent(){ if(currentId) showForm(currentId); }
+function cancelForm(){ currentId?viewBlog(currentId):showPane('empty'); }
+
+async function submitForm(){
+  const title=document.getElementById('fTitle').value.trim();
+  const content=document.getElementById('fContent').value.trim();
+  const errEl=document.getElementById('formError');
+  if(!title||!content){ errEl.textContent='Title and content are required.'; errEl.style.display='block'; return; }
+  errEl.style.display='none';
+  document.getElementById('submitLabel').textContent='Saving...';
+  try{
+    let r,d;
+    if(editingId){
+      r=await fetch(`${API}/blogs/${editingId}/`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,content})});
+      d=await r.json();
+      if(!r.ok) throw new Error(d.error||'Update failed');
+      showToast('Post updated');
+      currentId=editingId;
+    } else {
+      r=await fetch(`${API}/blogs/`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,content})});
+      d=await r.json();
+      if(!r.ok) throw new Error(d.title||d.content||'Create failed');
+      showToast('Post published');
+      currentId=d.id;
+    }
+    await loadBlogs();
+    viewBlog(currentId);
+  } catch(e){
+    showToast(e.message,'error');
+    document.getElementById('submitLabel').textContent=editingId?'Save changes':'Publish';
+  }
+}
+
+async function deleteCurrent(){
+  if(!currentId) return;
+  const b=blogs.find(x=>x.id===currentId);
+  if(!confirm(`Delete "${b?.title}"?`)) return;
+  try{
+    const r=await fetch(`${API}/blogs/${currentId}/`,{method:'DELETE'});
+    if(!r.ok) throw new Error('Delete failed');
+    showToast('Post deleted');
+    currentId=null;
+    await loadBlogs();
+    showPane('empty');
+  } catch(e){ showToast(e.message,'error'); }
+}
+
+loadBlogs();
+</script>
