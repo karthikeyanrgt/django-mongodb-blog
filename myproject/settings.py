@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,8 +46,8 @@ TEMPLATES = [
 ]
 
 # ─── MongoDB Connection ───────────────────────────────────────────────────────
-MONGO_URI = 'mongodb://localhost:27017/'
-MONGO_DB_NAME = 'myproject_db'
+MONGO_URI = os.getenv('MONGO_URI', 'mongodb://mongo:27017/')
+MONGO_DB_NAME = os.getenv('MONGO_DB_NAME', 'myproject_db')
 
 # No SQL database needed
 DATABASES = {}
