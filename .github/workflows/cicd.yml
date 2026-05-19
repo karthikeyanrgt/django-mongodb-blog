@@ -54,7 +54,7 @@ jobs:
         kubectl apply -f k8s/service.yaml
         kubectl set image deployment/django-deployment \
           django-container=${{ env.IMAGE_TAG }}
-        kubectl rollout status deployment/django-deployment --timeout=120s
+        kubectl rollout status deployment/django-deployment --timeout=300s
 
     # Step 7 - Get App URL
     - name: Get App Public IP
