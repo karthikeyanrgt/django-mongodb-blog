@@ -6,6 +6,7 @@ on:
 
 env:
   ACR_NAME: cicdtestacr
+  ACR_LOGIN_SERVER: cicdtestacr.azurecr.io
   AKS_CLUSTER: cicd_cluster
   RESOURCE_GROUP: rg-cicdtest
   IMAGE_NAME: django-app
@@ -15,40 +16,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
+    # Step 1 - Checkout code
+    - name: Checkout Code
       uses: actions/checkout@v3
 
+    # Step 2 - Login to Azure
     - name: Azure Login
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
 
+    # Step 3 - Login to ACR
     - name: Login to ACR
-      run: az acr login --name ${{ env.ACR_NAME }}
+      run: |
+        az acr login --name ${{ env.ACR_NAME }}
 
+    # Step 4 - Build and Push Docker Image
     - name: Build and Push Docker Image
       run: |
-        IMAGE_TAG=${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        IMAGE_TAG=${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
         docker build -t $IMAGE_TAG .
         docker push $IMAGE_TAG
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
+    # Step 5 - Get AKS Credentials
     - name: Get AKS Credentials
       run: |
         az aks get-credentials \
           --resource-group ${{ env.RESOURCE_GROUP }} \
-          --name ${{ env.AKS_CLUSTER }}
+          --name ${{ env.AKS_CLUSTER }} \
+          --overwrite-existing
 
-    - name: Deploy Manifests to AKS
+    # Step 6 - Deploy to AKS
+    - name: Deploy to AKS
       run: |
-        IMAGE_TAG=${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
-
-        # Apply manifests
         kubectl apply -f k8s/deployment.yaml
         kubectl apply -f k8s/service.yaml
-
-        # Update image to the newly built tag
         kubectl set image deployment/django-deployment \
-          django-container=$IMAGE_TAG
+          django-container=${{ env.IMAGE_TAG }}
+        kubectl rollout status deployment/django-deployment --timeout=120s
 
-        # Wait for rollout to complete
-        kubectl rollout status deployment/django-deployment
+    # Step 7 - Get App URL
+    - name: Get App Public IP
+      run: |
+        echo "Waiting for external IP..."
+        kubectl get service django-service
