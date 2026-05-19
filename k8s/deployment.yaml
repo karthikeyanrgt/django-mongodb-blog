@@ -6,6 +6,11 @@ metadata:
     app: django
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0        # ← don't create new pod before killing old
+      maxUnavailable: 1  # ← kill old pod first, then start new
   selector:
     matchLabels:
       app: django
@@ -16,7 +21,7 @@ spec:
     spec:
       containers:
       - name: django-container
-        image: cicdtestacr.azurecr.io/django-app:latest   # will be overridden by pipeline
+        image: cicdtestacr.azurecr.io/django-app:latest
         ports:
         - containerPort: 8000
         env:
