@@ -27,10 +27,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# ─── THIS WAS MISSING ─────────────────────────────────────────────────────────
 ROOT_URLCONF = 'myproject.urls'
 WSGI_APPLICATION = 'myproject.wsgi.application'
-# ─────────────────────────────────────────────────────────────────────────────
 
 TEMPLATES = [
     {
@@ -45,11 +43,10 @@ TEMPLATES = [
     },
 ]
 
-# ─── MongoDB Connection ───────────────────────────────────────────────────────
-MONGO_URI = os.getenv('MONGO_URI', 'mongodb://mongo:27017/')
+# ─── MongoDB (single clean config) ───────────────────────────────────────────
+MONGO_URI = os.getenv('MONGO_URI', 'mongodb://mongo-service:27017/')
 MONGO_DB_NAME = os.getenv('MONGO_DB_NAME', 'myproject_db')
 
-# No SQL database needed
 DATABASES = {}
 
 STATIC_URL = '/static/'

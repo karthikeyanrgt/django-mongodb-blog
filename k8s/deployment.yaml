@@ -25,10 +25,16 @@ spec:
         ports:
         - containerPort: 8000
         env:
-        - name: PYTHONDONTWRITEBYTECODE
-          value: "1"
-        - name: PYTHONUNBUFFERED
-          value: "1"
+          - name: PYTHONDONTWRITEBYTECODE
+            value: "1"
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          - name: MONGODB_HOST
+            value: "mongo-service"
+          - name: MONGODB_PORT
+            value: "27017"
+          - name: MONGODB_NAME
+            value: "blogdb"
         resources:
           requests:
             cpu: "100m"
