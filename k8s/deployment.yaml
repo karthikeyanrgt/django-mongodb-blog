@@ -7,10 +7,7 @@ metadata:
 spec:
   replicas: 1
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 0        # ← don't create new pod before killing old
-      maxUnavailable: 1  # ← kill old pod first, then start new
+    type: Recreate
   selector:
     matchLabels:
       app: django
@@ -37,8 +34,8 @@ spec:
             value: "blogdb"
         resources:
           requests:
-            cpu: "100m"
-            memory: "128Mi"
+            cpu: "80m"
+            memory: "100Mi"
           limits:
-            cpu: "200m"
-            memory: "256Mi"
+            cpu: "150m"
+            memory: "200Mi"
